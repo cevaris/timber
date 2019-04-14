@@ -3,7 +3,6 @@ package timber
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -30,7 +29,9 @@ func NewGoFileLogger(name string) Logger {
 
 	fmt.Println("created log file", logFilePath)
 
-	files := io.MultiWriter(logFile, os.Stdout)
+	files := logFile
+	//files := io.MultiWriter(logFile, os.Stdout)
+
 	logger := log.New(files, "", log.LstdFlags|log.LUTC)
 
 	return &goFileLogger{logger: logger}
