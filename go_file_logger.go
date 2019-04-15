@@ -3,6 +3,7 @@ package timber
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,7 +11,8 @@ import (
 )
 
 // NewGoFileLogger returns new logger
-func NewGoFileLogger(name string) Logger {
+// if stdout==true, multi-write logs to stdout and file
+func NewGoFileLogger(name string, stdout bool) Logger {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic("could locate $USER home directory: " + err.Error())
@@ -29,10 +31,14 @@ func NewGoFileLogger(name string) Logger {
 
 	fmt.Println("created log file", logFilePath)
 
-	files := logFile
-	//files := io.MultiWriter(logFile, os.Stdout)
+	var sink io.Writer
+	if stdout {
+		sink = io.MultiWriter(logFile, os.Stdout)
+	} else {
+		sink = logFile
+	}
 
-	logger := log.New(files, "", log.LstdFlags|log.LUTC)
+	logger := log.New(sink, "", log.LstdFlags|log.LUTC)
 
 	return &goFileLogger{logger: logger}
 }
