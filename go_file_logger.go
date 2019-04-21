@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 )
@@ -13,12 +14,12 @@ import (
 // NewGoFileLogger returns new logger
 // if stdout==true, multi-write logs to stdout and file
 func NewGoFileLogger(name string, stdout bool) Logger {
-	homeDir, err := os.UserHomeDir()
+	currUser, err := user.Current()
 	if err != nil {
 		panic("could locate $USER home directory: " + err.Error())
 	}
 
-	logDirPath := filepath.Join(homeDir, "var", "log", "status")
+	logDirPath := filepath.Join(currUser.HomeDir, "var", "log", "status")
 	if err = os.MkdirAll(logDirPath, os.ModePerm); err != nil {
 		panic("could create log directory: " + err.Error())
 	}
